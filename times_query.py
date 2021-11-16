@@ -22,7 +22,7 @@ nights_run = 4
 now = Time.now()
 
 # set semester start date
-date = '2021-10-20'
+date = '2021-10-01'
 
 # set semester end date
 semester_end = '2022-03-31 19:00'
@@ -31,6 +31,9 @@ semester_end = '2022-03-31 19:00'
 # TODO can we get La Silla? Maybe using astropy? Does it matter
 lco = Observer.at_site("lco")
 #mmt = Observer.at_site('mmt', pressure=0*u.bar)
+
+# set eso query row limit - setting to -1 doesn't work properly!
+eso.ROW_LIMIT = 100000
 
 # =============================================================================
 # define programs and nights
@@ -85,39 +88,40 @@ while date < Time(semester_end):
 				# also add night time to "available" count (one for all)
 				available += ndur 
 
-	# check text files for the night
-	# define file name
-	fil = 'nights/'+str(date).split()[0].replace('-','')+'.txt'
-	# if it exists open it
-	if os.access(fil,os.F_OK):
-		fle = open(fil,'r')
-		flines = fle.readlines()
-	# otherwise set to empty array
-	else:
-		flines = []
+	# query eso archive for the night
+	night = str(date).split()[0]
+	data=eso.query_main(column_filters={'instrument':'FEROS','night':night},
+                    columns=('OBJECT','RA','DEC','Program_ID','Instrument',
+                             'Category','Type','Mode','Dataset ID','Release_Date',
+                             'TPL ID','TPL START','Exptime','Exposure',
+                             'filter_lambda_min','filter_lambda_max','MJD-OBS',
+                             'Airmass','DIMM Seeing at Start','pi_coi'))
+
 	# initialize night time count for all projects as 0
 	tottime = 0
-	# loop over the lines
-	for line in flines:
-		# get the run PID and exposure time for each spectrum
-		cos = line.split()
-		runID = cos[3]
-		texp = cos[14]
+
+	# test loop
+	if date < Time('2021-10-21'):
+
 		# loop over the projects
 		for proj in projects:
 			# get the PIDs
 			pids = ids[proj]
 			# loop over the PIDs
 			for pid in pids:
-				# if the pid matches the run PID
-				if pid in runID:
+				# find the entries with this pid
+				aux_mask = np.char.find(data['Program_ID'],pid)
+				mask = np.where(aux_mask!=-1)
+				# check that mask is not empty
+				if mask[0].size > 0:
 					# add the exposure time (in h, plus 240s overhead) to project used time
-					used[proj] += (float(texp)+240.)/3600.
+					used[proj] += np.sum(data['Exptime'][mask]+240)/3600.
 					# add the time to the total time used for all projects
-					tottime += (float(texp) + 240.)/3600.
-		#print(runID, texp)
-	# if the night file is not empty	
-	if len(flines)>0:
+					tottime += np.sum(data['Exptime'][mask]+240)/3600.
+	else: 		
+		data = np.array([])
+	# if the night query is not empty	
+	if len(data)>0:
 		# append total time for all projects/night duration to ratios
 		ratios.append(tottime/ndur)
 
