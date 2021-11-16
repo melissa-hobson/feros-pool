@@ -198,6 +198,7 @@ for proj in projects:
 	lines.append('    '+proj+': '+str(props[proj]*(totused+available) - used[proj])+' h \n\n')
 
 # time in this run per project
+lines.append('hours in run (nights = '+str(nights_run)+'):\n\n')
 # loop over projects
 for proj in projects:
 	# add line with total time left
