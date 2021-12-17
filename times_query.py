@@ -16,7 +16,7 @@ from astroquery.eso import Eso
 eso = Eso()
 
 # define nights in run - only thing to change!
-nights_run = 4
+nights_run = 7
 
 # get time now
 now = Time.now()
@@ -54,6 +54,9 @@ nights = {'moyano':['2021-12-28','2021-12-29','2021-12-30'],\
 		  'vines':['2021-10-05','2021-10-06','2021-10-07','2021-10-08','2021-10-09','2021-12-24','2021-12-25','2021-12-26','2021-12-27']
 		  }
 
+# list of all nights
+all_nights = sorted({x for v in nights.values() for x in v})
+
 # initialize used and full time per project
 used = {'chaname':0,'brahm':0,'zakhozhay':0,'moyano':0,'vines':0}
 full = {'chaname':0,'brahm':0,'zakhozhay':0,'moyano':0,'vines':0}
@@ -66,11 +69,10 @@ available = 0.
 # Compute used and available time
 # =============================================================================
 
-# set start time to 7pm
-date = Time(date+' 19:00')
-
-# loop over dates until end of semester
-while date < Time(semester_end):
+# loop over dates in all_nights list
+for date in all_nights:
+	# set start time to 7pm
+	date = Time(date+' 19:00')
 	# get evening and morning twilight for date and location
 	tw1 = lco.twilight_evening_nautical(date, which='previous')
 	tw2 = lco.twilight_morning_nautical(date, which='previous')
@@ -88,45 +90,47 @@ while date < Time(semester_end):
 				# also add night time to "available" count (one for all)
 				available += ndur 
 
-	# query eso archive for the night
-	night = str(date).split()[0]
-	data=eso.query_main(column_filters={'instrument':'FEROS','night':night},
-                    columns=('OBJECT','RA','DEC','Program_ID','Instrument',
-                             'Category','Type','Mode','Dataset ID','Release_Date',
-                             'TPL ID','TPL START','Exptime','Exposure',
-                             'filter_lambda_min','filter_lambda_max','MJD-OBS',
-                             'Airmass','DIMM Seeing at Start','pi_coi'))
+	# if the date is in the past:
+	if date < now:
+		# query eso archive for the night
+		night = str(date).split()[0]
+		data=eso.query_main(column_filters={'instrument':'FEROS','night':night},
+		                columns=('OBJECT','RA','DEC','Program_ID','Instrument',
+		                         'Category','Type','Mode','Dataset ID','Release_Date',
+		                         'TPL ID','TPL START','Exptime','Exposure',
+		                         'filter_lambda_min','filter_lambda_max','MJD-OBS',
+		                         'Airmass','DIMM Seeing at Start','pi_coi'))
 
-	# initialize night time count for all projects as 0
-	tottime = 0
+		# initialize night time count for all projects as 0
+		tottime = 0
 
-	# test loop
-	if date < Time('2021-10-21'):
+		# test loop for empty query results
+		if data is not None:
 
-		# loop over the projects
-		for proj in projects:
-			# get the PIDs
-			pids = ids[proj]
-			# loop over the PIDs
-			for pid in pids:
-				# find the entries with this pid
-				aux_mask = np.char.find(data['Program_ID'],pid)
-				mask = np.where(aux_mask!=-1)
-				# check that mask is not empty
-				if mask[0].size > 0:
-					# add the exposure time (in h, plus 240s overhead) to project used time
-					used[proj] += np.sum(data['Exptime'][mask]+240)/3600.
-					# add the time to the total time used for all projects
-					tottime += np.sum(data['Exptime'][mask]+240)/3600.
-	else: 		
-		data = np.array([])
-	# if the night query is not empty	
-	if len(data)>0:
-		# append total time for all projects/night duration to ratios
-		ratios.append(tottime/ndur)
+			# loop over the projects
+			for proj in projects:
+				# get the PIDs
+				pids = ids[proj]
+				# loop over the PIDs
+				for pid in pids:
+					# find the entries with this pid
+					aux_mask = np.char.find(data['Program_ID'],pid)
+					mask = np.where(aux_mask!=-1)
+					# check that mask is not empty
+					if mask[0].size > 0:
+						# add the exposure time (in h, plus 240s overhead) to project used time
+						used[proj] += np.sum(data['Exptime'][mask]+240)/3600.
+						# add the time to the total time used for all projects
+						tottime += np.sum(data['Exptime'][mask]+240)/3600.
+		else: 
+			print('no data retrieved for night '+night)		
+			data = np.array([])
 
-	# increase date by 1
-	date += 1
+		# if the night query is not empty	
+		if len(data)>0:
+			# append total time for all projects/night duration to ratios
+			ratios.append(tottime/ndur)
+
 
 # convert ratios to array
 ratios = np.array(ratios)
