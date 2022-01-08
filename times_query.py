@@ -93,13 +93,14 @@ for date in all_nights:
 	# if the date is in the past:
 	if date < now:
 		# query eso archive for the night
+		eso.ROW_LIMIT = 100000
 		night = str(date).split()[0]
 		data=eso.query_main(column_filters={'instrument':'FEROS','night':night},
 		                columns=('OBJECT','RA','DEC','Program_ID','Instrument',
 		                         'Category','Type','Mode','Dataset ID','Release_Date',
 		                         'TPL ID','TPL START','Exptime','Exposure',
 		                         'filter_lambda_min','filter_lambda_max','MJD-OBS',
-		                         'Airmass','DIMM Seeing at Start','pi_coi'))
+		                         'Airmass','DIMM Seeing at Start'))#,'pi_coi'))
 
 		# initialize night time count for all projects as 0
 		tottime = 0
