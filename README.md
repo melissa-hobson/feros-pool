@@ -1,23 +1,23 @@
 # feros-pool
 Computes used and available time for different observing projects
 
-projected time left computed on 2021-12-17 15:58:34.742958:
+projected time left computed on 2022-01-08 11:59:01.303545:
 
-    brahm: 120.39659198139059 h 
+    brahm: 100.68762455510559 h 
 
-    moyano: 11.644227361169216 h 
+    moyano: 10.085165865721098 h 
 
-    zakhozhay: 63.652095768974085 h 
+    zakhozhay: 53.08954904058542 h 
 
-    vines: 27.299758821238637 h 
+    vines: 22.07973977987029 h 
 
-hours in run (nights = 7):
+hours in run (nights = 10):
 
-    brahm: 27.927238299800564 h 
+    brahm: 39.896054701352064 h 
 
-    moyano: 2.209161228135533 h 
+    moyano: 3.155944651462968 h 
 
-    zakhozhay: 14.96693088726757 h 
+    zakhozhay: 21.381329779103638 h 
 
-    vines: 7.3966695847963315 h 
+    vines: 10.566670868081331 h 
 

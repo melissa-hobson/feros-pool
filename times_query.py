@@ -16,7 +16,7 @@ from astroquery.eso import Eso
 eso = Eso()
 
 # define nights in run - only thing to change!
-nights_run = 7
+nights_run = 10
 
 # get time now
 now = Time.now()
@@ -43,7 +43,7 @@ eso.ROW_LIMIT = 100000
 # list of projects
 projects = ['brahm','moyano','zakhozhay','vines']
 # list of IDs per project
-ids = {'brahm':['0108.A-9003'],'zakhozhay':['0108.A-9029'],'moyano':['0108.A-9008', '0106.A-9004'],'vines':['0108.A-9007', '0106.A-9003']}
+ids = {'brahm':['0108.A-9003'],'zakhozhay':['0108.A-9029', '0108.A-9014'],'moyano':['0108.A-9008', '0106.A-9004'],'vines':['0108.A-9007', '0106.A-9003']}
 # list of nights assigned to each project
 nights = {'moyano':['2021-12-28','2021-12-29','2021-12-30'],\
 		  'zakhozhay':['2021-10-22','2021-10-23','2021-10-24','2021-10-25','2021-10-26','2021-10-27','2021-10-28','2021-10-29','2021-10-30',\
