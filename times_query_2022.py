@@ -16,7 +16,7 @@ from astroquery.eso import Eso
 eso = Eso()
 
 # define nights and programs in run - only thing to change!
-nights_run = 19
+nights_run = 10
 # programs is 3 or 4
 programs_run = 4
 
@@ -50,11 +50,12 @@ projects = ['hobson','zakhozhay','moyano','vines']
 ids = {'hobson':['109.A-9003'],'zakhozhay':['109.A-9014'],'moyano':['0109.A-9025'],'vines':['0109.A-9024']}
 
 # list of nights assigned to each project
-nights = {'moyano':['2022-07-27', '2022-07-28', '2022-07-29'],\
+nights = {'moyano':['2022-07-27', '2022-07-28', '2022-07-29', '2022-09-11','2022-09-12','2022-09-13'],\
 		  'zakhozhay':['2022-04-09', '2022-04-10', '2022-04-11', '2022-04-12', '2022-04-13', '2022-04-14', '2022-04-15', '2022-04-16', '2022-04-17', '2022-04-18', '2022-04-19', '2022-04-20', '2022-04-21'],\
 		  'hobson':['2022-06-25', '2022-06-26', '2022-06-27', '2022-06-28', '2022-06-29', '2022-06-30', '2022-07-01', '2022-07-02', '2022-07-03', '2022-07-04', '2022-07-05', '2022-07-06', '2022-07-07', \
                     '2022-07-08', '2022-07-09', '2022-07-10', '2022-07-11', '2022-07-12', '2022-07-13', \
-                    '2022-08-08', '2022-08-09', '2022-08-10', '2022-08-11', '2022-08-12', '2022-08-13', '2022-08-14', '2022-08-15', '2022-08-16', '2022-08-17', '2022-08-18', '2022-08-19', '2022-08-20'],\
+                    '2022-08-08', '2022-08-09', '2022-08-10', '2022-08-11', '2022-08-12', '2022-08-13', '2022-08-14', '2022-08-15', '2022-08-16', '2022-08-17', '2022-08-18', '2022-08-19', '2022-08-20', \
+                    '2022-09-21','2022-09-22','2022-09-23','2022-09-24','2022-09-25','2022-09-26','2022-09-27','2022-09-28','2022-09-29','2022-09-30'],\
 		  'vines':['2022-05-02', '2022-05-03', '2022-05-04', '2022-05-05', '2022-05-06']
 		  }
 
@@ -70,16 +71,24 @@ runs = {'run1':['2022-04-09', '2022-04-10', '2022-04-11', '2022-04-12', '2022-04
                 '2022-07-04', '2022-07-05', '2022-07-06', '2022-07-07', '2022-07-08', '2022-07-09', '2022-07-10', '2022-07-11', '2022-07-12', '2022-07-13'],
         'run3b':['2022-07-27', '2022-07-28', '2022-07-29'],
 		'run4':['2022-08-08', '2022-08-09', '2022-08-10', '2022-08-11', '2022-08-12', '2022-08-13', '2022-08-14', '2022-08-15', '2022-08-16', '2022-08-17', 
-                '2022-08-18', '2022-08-19', '2022-08-20']
+                '2022-08-18', '2022-08-19', '2022-08-20'],
+        'run5':['2022-09-11','2022-09-12','2022-09-13'],
+        'run6':['2022-09-21','2022-09-22','2022-09-23','2022-09-24','2022-09-25','2022-09-26','2022-09-27','2022-09-28','2022-09-29','2022-09-30']
 		}
 
 # list of assigned hours per project
 # estimating moyano & vines from number of nights
 # notes: hobson + zhakozay have 52 nights for 216 hours, meaning 4.9h per night
 # vines only has half the night on the last of that run
-# moyano = 3*4.9 = 14.7 ~ 15
-# vines = 4.5*4.9 = 22.09 ~ 22
-assigned = {'hobson':157,'zakhozhay':59,'moyano':15,'vines':22}
+# moyano = 3*4.9 = 14.7 ~ 15 h
+# vines = 4.5*4.9 = 22.09 ~ 22 h
+#assigned = {'hobson':157,'zakhozhay':59,'moyano':15,'vines':22}
+# September new runs:
+# moyano: 3 more nights = 3*4.9 = 14.7 ~ 15 h
+# hobson/zakhozhay 10 more nights: assume same 38-62 split
+# hobson: 10*4.9*0.62 = 30.38 ~ 30 h
+# zakhozhay: 10*4.9*0.38  = 18.62 ~ 19 h
+assigned = {'hobson':187,'zakhozhay':78,'moyano':30,'vines':22}
 
 # proportions from assigned hours
 total_assi = sum(assigned.values(), 0.0)
@@ -212,9 +221,9 @@ if programs_run == 4:
 	# loop over projects
 	for proj in projects:
 		if proj == 'zakhozhay':
-			props[proj] = prop_init[proj]+4.5*prop_init[proj]/47
+			props[proj] = prop_init[proj]+nights_run*prop_init[proj]/57
 		else:
-			props[proj] = prop_init[proj]-4.5*prop_init['zakhozhay']/(3*47)
+			props[proj] = prop_init[proj]-nights_run*prop_init['zakhozhay']/(3*57)
 	# renormalize proportions
 	props_sum = sum(props.values(), 0.0)
 	props = {k: v / props_sum for k, v in props.items()}
@@ -223,7 +232,7 @@ elif programs_run == 3:
 			if proj == 'zakhozhay':
 				props[proj] = 0
 			else:
-				props[proj] = prop_init[proj]+4.5*prop_init['zakhozhay']/(3)
+				props[proj] = prop_init[proj]+nights_run*prop_init['zakhozhay']/(3)
 		# renormalize proportions
 		props_sum = sum(props.values(), 0.0)
 		props = {k: v / props_sum for k, v in props.items()}
@@ -245,6 +254,13 @@ for proj in projects:
 	# proportion for project times (total used+available) - used for project
 	print(proj,props[proj]*(totused+available) - used[proj])
 	# TODO WHY SO CONVOLUTED?
+
+# print total time left
+print('total time left:')
+# per project
+for proj in projects:
+	# total-used
+	print(proj,full[proj] - used[proj])
 
 # print hours in run
 print('hours in run (nights = '+str(nights_run)+'):')
