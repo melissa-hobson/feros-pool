@@ -282,7 +282,18 @@ print('total time left:')
 # per project
 for proj in projects:
 	# total-used
-	print(proj,full[proj] - used[proj])
+	print(proj,round(full[proj] - used[proj],1))
+
+# save to file
+# create header line
+lines = ['# feros-pool\n', 'Computes used and available time for different observing projects\n','\n']
+# add line stating date of computation
+lines.append('projected time left computed on '+now.to_value('iso', subfmt='date')+':\n\n')
+# total time left per project
+# loop over projects
+for proj in projects:
+	# add line with total time left
+	lines.append('    '+proj+': '+str(round(props[proj]*(totused+available) - used[proj],1))+' h \n\n')
 
 # loop over the requested runs
 for run_i in runs_compute:
@@ -290,30 +301,19 @@ for run_i in runs_compute:
 	run_check = runs[run_key]
 	nights_run = len(run_check)
 	# print hours in run
-	print('hours in  '+run_key+' (nights = '+str(nights_run)+', '+str(run_check[0])+' - '+str(run_check[-1])+'):')
+	print('hours in '+run_key+' (nights = '+str(nights_run)+', '+str(run_check[0])+' - '+str(run_check[-1])+'):')
 	# per project
 	for proj in projects:
 		# proportion * number of nights * 7.5h per night
-		print(proj,props[proj]*nights_run*7.5)
-	
+		print(proj,round(props[proj]*nights_run*7.5,1))
+
 	# save to file
-	# create header line
-	lines = ['# feros-pool\n', 'Computes used and available time for different observing projects\n','\n']
-	# add line stating date of computation
-	lines.append('projected time left computed on '+str(now)+':\n\n')
-	
-	# total time left per project
-	# loop over projects
-	for proj in projects:
-		# add line with total time left
-		lines.append('    '+proj+': '+str(props[proj]*(totused+available) - used[proj])+' h \n\n')
-	
 	# time in this run per project
 	lines.append('hours in '+run_key+' (nights = '+str(nights_run)+', '+str(run_check[0])+' - '+str(run_check[-1])+'):\n\n')
 	# loop over projects
 	for proj in projects:
 		# add line with total time left
-		lines.append('    '+proj+': '+str(props[proj]*nights_run*7.5)+' h \n\n')
+		lines.append('    '+proj+': '+str(round(props[proj]*nights_run*7.5,1))+' h \n\n')
 
 
 # open file, write, close
