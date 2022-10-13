@@ -19,7 +19,7 @@ from astroquery.eso import Eso
 eso = Eso()
 
 # define runs and programs in run - only thing to change!
-runs_compute = [1,2,3,4]
+runs_compute = [2,3,4]
 # programs is 3 or 4
 programs_run = 4
 # plot the runs or no
@@ -52,7 +52,7 @@ eso.ROW_LIMIT = 100000
 projects = ['hobson','zakhozhay','moyano','vines']
 
 # list of IDs per project
-ids = {'hobson':['0110.A-9011'],'zakhozhay':['0110.A-9013'],'moyano':['0109.A-9025'],'vines':['0109.A-9024']}
+ids = {'hobson':['0110.A-9011'],'zakhozhay':['0110.A-9013'],'moyano':['0110.A-9036'],'vines':['0110.A-9035']}
 
 # list of nights assigned to each project
 nights = {'moyano':['2023-01-07','2023-01-08','2023-01-09','2023-01-10'],\
